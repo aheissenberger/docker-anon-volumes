@@ -1,6 +1,6 @@
 # Docker compose up build fails to update container
 
-if you try the following command to **update your service after changes** and it works for you with some project but **not with all project** I can help you to fix the problem and understand the reason behind this behaviour:
+if you try the following command to **update your service after changes** and it works for you with some projects but **not with all projects** I can help you to fix the problem and understand the reason behind this behaviour:
 
 ```bash
 docker compose -f docker-compose.prod.yml up --build --no-deps --detach your_service
@@ -27,6 +27,8 @@ To fix the problem with **anonymous volumes** you only need to add `--renew-anon
 docker compose -f docker-compose.prod.yml up --build --no-deps --renew-anon-volumes --detach your_service
 ```
 The additional flag will allway recreate all anonymous volumes on the restart for this service. This will make any changes overlapping with these volumes to become visible.
+
+There is an other option called `--force-recreate` which suggest to be the solution but will not solve the problem with the anonymous volumes mapping over your changes.
 
 ## What's behind anonymous volumes
 
@@ -74,6 +76,8 @@ src
   Dockerfile
 docker-compose.yml
 ```
+You can clone these files from this repository:
+https://github.com/aheissenberger/docker-anon-volumes
 
 **src/hello-world.sh** - our service app
 ```bash
@@ -208,7 +212,7 @@ hello_1  | Hello World! Hello Rudi
   2. The container ID here `2419dd47277a` is different to the one before `1df0f6ee87d4`. This is a new container with the changes `name.txt`
   3. The content of the anonymous volume is mapped to the `/app/config` directory and is overlaying the new container with the old files
 
-#### Fixing
+#### Fixing Options
 1. remove the `VOLUME` command if not used
 2. add `--renew-anon-volumes` to your `up --build` to [recreate this anonymous volume](https://docs.docker.com/compose/reference/up/)
 
